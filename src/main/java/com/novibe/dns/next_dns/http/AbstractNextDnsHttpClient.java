@@ -37,7 +37,7 @@ public abstract class AbstractNextDnsHttpClient extends HttpRequestSender {
     @Override
     protected void react404(DnsHttpError dnsHttpError) {
         if (dnsProfile.clientId() != null) {
-            Log.fail("Make sure your profile is registered via https://my.nextdns.io/signup. Default unregistered profile can't be configured");
+            Log.fail("Make sure that the values of AUTH_SECRET and CLIENT_ID belongs to same account!");
         }
         throw dnsHttpError;
     }
