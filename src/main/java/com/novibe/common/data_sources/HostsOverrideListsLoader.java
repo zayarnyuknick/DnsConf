@@ -18,15 +18,17 @@ public class HostsOverrideListsLoader extends ListLoader<HostsOverrideListsLoade
 
     @Override
     protected Predicate<String> filterRelatedLines() {
-        return line -> !HostsBlockListsLoader.isBlock(line);
+        return line -> DataParser.parseHostsLine(line)
+                .map(DataParser.HostsLine::ip)
+                .filter(ip -> !HostsBlockListsLoader.isBlockIp(ip))
+                .isPresent();
     }
 
     @Override
     protected BypassRoute toObject(String line) {
-        int delimiter = line.indexOf(" ");
-        String ip = line.substring(0, delimiter++);
-        String website = DataParser.removeWWW(line.substring(delimiter).strip());
-        return new BypassRoute(ip, website);
+        DataParser.HostsLine hostsLine = DataParser.parseHostsLine(line)
+                .orElseThrow(() -> new IllegalArgumentException("Malformed hosts entry: " + line));
+        return new BypassRoute(hostsLine.ip(), DataParser.removeWWW(hostsLine.domain()));
     }
 
 }
